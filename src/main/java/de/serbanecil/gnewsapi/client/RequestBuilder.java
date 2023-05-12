@@ -1,6 +1,6 @@
 package de.serbanecil.gnewsapi.client;
 
-import de.serbanecil.gnewsapi.exception.InvalidParamException;
+import de.serbanecil.gnewsapi.exception.GnewsApiException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +24,7 @@ public class RequestBuilder {
      * Category
      */
     private String defaultCategory;
-    private final String CATEGORY = "category=";
+    private final String CATEGORY = "&category=";
     private List<String> allowedCategories = List.of("general", "world", "nation", "business", "technology",
             "entertainment", "sports", "science", "health");
 
@@ -61,7 +61,7 @@ public class RequestBuilder {
 
 
     public String getBasePath() {
-        return basePath;
+        return basePath.replace("?&", "?");
     }
 
     /**
@@ -79,7 +79,7 @@ public class RequestBuilder {
             String errorErrorResponse = String.format("The category %s is not allowed. Please choose one of: %s",
                     category, allowedCategories);
             LOGGER.error(errorErrorResponse);
-            throw new InvalidParamException(errorErrorResponse);
+            throw new GnewsApiException(errorErrorResponse);
         }
         basePath = basePath + CATEGORY + category.toLowerCase();
         return this;
@@ -100,7 +100,7 @@ public class RequestBuilder {
             String errorErrorResponse = String.format("The language %s is not allowed. Please choose one of: %s",
                     language, allowedLanguages);
             LOGGER.error(errorErrorResponse);
-            throw new InvalidParamException(errorErrorResponse);
+            throw new GnewsApiException(errorErrorResponse);
         }
         basePath = basePath + LANGUAGE + language.toLowerCase();
         return this;
@@ -121,7 +121,7 @@ public class RequestBuilder {
             String errorErrorResponse = String.format("The country %s is not allowed. Please choose one of: %s",
                     country, allowedCountries);
             LOGGER.error(errorErrorResponse);
-            throw new InvalidParamException(errorErrorResponse);
+            throw new GnewsApiException(errorErrorResponse);
         }
         basePath = basePath + COUNTRY + country.toLowerCase();
         return this;
