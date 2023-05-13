@@ -63,7 +63,7 @@ public class HeadlinesController {
                     @ApiResponse(responseCode = "429", description = "Too Many Requests -- You have made more requests " +
                             "per second than you are allowed.",
                             content = @Content(schema = @Schema(implementation = ErrorResponseObject.class))),
-                    @ApiResponse(responseCode = "500", description = "nternal Server Error -- We had a problem with our " +
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error -- We had a problem with our " +
                             "server. Try again later.",
                             content = @Content(schema = @Schema(implementation = ErrorResponseObject.class))),
                     @ApiResponse(responseCode = "503", description = "Service Unavailable -- We're temporarily offline " +

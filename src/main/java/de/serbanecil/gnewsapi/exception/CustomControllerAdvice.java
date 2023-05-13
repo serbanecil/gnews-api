@@ -3,6 +3,7 @@ package de.serbanecil.gnewsapi.exception;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -37,6 +38,12 @@ public class CustomControllerAdvice {
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
     protected ResponseEntity<ErrorResponseObject> handleCallNotPermittedException(Exception ex) {
         return new ResponseEntity<>(new ErrorResponseObject(ex.getMessage(), 503), HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
+    @ExceptionHandler(value = {MissingServletRequestParameterException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    protected ResponseEntity<ErrorResponseObject> handleMissingRequestParameter(MissingServletRequestParameterException ex) {
+        return new ResponseEntity<>(new ErrorResponseObject(ex.getMessage(), 400), HttpStatus.BAD_REQUEST);
     }
 
 }
