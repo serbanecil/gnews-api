@@ -1,4 +1,4 @@
-package de.serbanecil.gnewsapi.controller;
+package de.serbanecil.gnewsapi.client.controller;
 
 import de.serbanecil.gnewsapi.client.GNewsClient;
 import de.serbanecil.gnewsapi.client.model.Response;
@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -57,7 +58,7 @@ public class SearchController {
     )
     @GetMapping("/getNews")
     @CircuitBreaker(name = "Gnews")
-    public Response searchNews(
+    public ResponseEntity<Response> searchNews(
             @RequestParam(name="category", required = false)
             @Parameter(name = "category", in = ParameterIn.QUERY, description = "This parameter allows you to change " +
                     "the category for the request. The available categories are : general, world, nation, business, technology, " +
@@ -98,6 +99,6 @@ public class SearchController {
         if (StringUtils.isBlank(keywords)) {
             throw new GnewsApiException("The keywords are mandatory!");
         }
-        return gNewsClient.findNews(category, language, country, max, keywords, in);
+        return ResponseEntity.ok().body(gNewsClient.findNews(category, language, country, max, keywords, in));
     }
 }

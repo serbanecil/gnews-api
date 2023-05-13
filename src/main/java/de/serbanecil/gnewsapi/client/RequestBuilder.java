@@ -157,15 +157,19 @@ public class RequestBuilder {
     public RequestBuilder addKeywords(String keywords, String in) {
         addKeywords(keywords);
         if (!StringUtils.isBlank(in)) {
-            StringBuilder inKeywords = new StringBuilder();
-            for (String token : in.split(",")) {
-                if (!List.of("title", "description", "content").contains(token.toLowerCase())) {
-                    throw new GnewsApiException("Invalid value for 'in'. Only  ('title', 'description' and 'content' are allowed)");
+            String[] tokens = in.split(",");
+            String inKeywords = "";
+            for (int i = 0; i < tokens.length; ++i) {
+                if (!List.of("title", "description", "content").contains(tokens[i].trim().toLowerCase())) {
+                    throw new GnewsApiException("Invalid value for 'in'. Only  ('title', 'description' and 'content' " +
+                            "are allowed)");
                 }
-                inKeywords.append(token.toLowerCase()).append(",");
+                inKeywords += tokens[i].trim().toLowerCase();
+                if (i < tokens.length-1) {
+                    inKeywords += ",";
+                }
             }
             basePath = basePath + "&in=" + inKeywords;
-
         }
         return this;
     }

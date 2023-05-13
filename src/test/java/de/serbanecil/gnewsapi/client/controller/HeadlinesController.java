@@ -1,4 +1,4 @@
-package de.serbanecil.gnewsapi.controller;
+package de.serbanecil.gnewsapi.client.controller;
 
 import de.serbanecil.gnewsapi.client.GNewsClient;
 import de.serbanecil.gnewsapi.client.model.Response;

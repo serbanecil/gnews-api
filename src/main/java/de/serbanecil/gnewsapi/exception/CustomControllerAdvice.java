@@ -22,7 +22,6 @@ public class CustomControllerAdvice {
      * @return A ErrorResponseObject containing the timestamp, the exception message and a status code
      */
     @ExceptionHandler(value = {GnewsApiException.class})
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected ResponseEntity<ErrorResponseObject> handleGNewsApiException(GnewsApiException ex) {
         return new ResponseEntity<>(new ErrorResponseObject(ex.getMessage(), ex.getCode()), HttpStatus.resolve(ex.getCode()));
     }
