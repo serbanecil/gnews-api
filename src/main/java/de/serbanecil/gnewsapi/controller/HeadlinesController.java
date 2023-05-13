@@ -2,7 +2,8 @@ package de.serbanecil.gnewsapi.controller;
 
 import de.serbanecil.gnewsapi.client.GNewsClient;
 import de.serbanecil.gnewsapi.client.model.Response;
-import de.serbanecil.gnewsapi.error.ErrorResponseObject;
+import de.serbanecil.gnewsapi.exception.ErrorResponseObject;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -11,11 +12,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * This class represents the controller for the Headlines.
+ */
 @RestController
 @RequestMapping("/headlines")
 public class HeadlinesController {
@@ -34,25 +39,41 @@ public class HeadlinesController {
             }
     )
     @GetMapping("/top10Germany")
-    public Response getTop10Germany() {
-        return gNewsClient.findHeadLines("general", "de", "de",
-                10, "");
+    @CircuitBreaker(name = "Gnews")
+    public ResponseEntity<Response> getTop10Germany() {
+        return ResponseEntity.ok().body(gNewsClient.findHeadLines("general", "de", "de",
+                10, ""));
     }
 
     @Operation(
             description = "Returns the headlines with the given 'CATEGORY', from the given 'COUNTRY' " +
-                    "with the given 'LANGUAGE' using the given 'KEYWORDS' limited to 'MAX' news"
+                    "with the given 'LANGUAGE' using the given 'KEYWORDS' limited to 'MAX' headlines (maximum 10)"
     )
     @ApiResponses(
             value = {
                     @ApiResponse(responseCode = "200", description = "The headlines are returned to the caller",
                             content = @Content(schema = @Schema(implementation = Response.class))),
-                    @ApiResponse(responseCode = "400", description = "The request was incorrect",
-                    content = @Content(schema = @Schema(implementation = ErrorResponseObject.class)))
+                    @ApiResponse(responseCode = "400", description = "Bad Request -- Your request is invalid.",
+                            content = @Content(schema = @Schema(implementation = ErrorResponseObject.class))),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized -- Your API key is wrong.",
+                            content = @Content(schema = @Schema(implementation = ErrorResponseObject.class))),
+                    @ApiResponse(responseCode = "403", description = "Forbidden -- You have reached your daily quota, " +
+                            "the next reset is at 00:00 UTC.",
+                            content = @Content(schema = @Schema(implementation = ErrorResponseObject.class))),
+                    @ApiResponse(responseCode = "429", description = "Too Many Requests -- You have made more requests " +
+                            "per second than you are allowed.",
+                            content = @Content(schema = @Schema(implementation = ErrorResponseObject.class))),
+                    @ApiResponse(responseCode = "500", description = "nternal Server Error -- We had a problem with our " +
+                            "server. Try again later.",
+                            content = @Content(schema = @Schema(implementation = ErrorResponseObject.class))),
+                    @ApiResponse(responseCode = "503", description = "Service Unavailable -- We're temporarily offline " +
+                            "for maintenance. Please try again later.",
+                            content = @Content(schema = @Schema(implementation = ErrorResponseObject.class)))
             }
     )
     @GetMapping("/getHeadlines")
-    public Response getHeadlines(
+    @CircuitBreaker(name = "Gnews")
+    public ResponseEntity<Response> getHeadlines(
             @RequestParam(name="category", required = false)
             @Parameter(name = "category", in = ParameterIn.QUERY, description = "This parameter allows you to change " +
                     "the category for the request. The available categories are : general, world, nation, business, technology, " +
@@ -80,8 +101,7 @@ public class HeadlinesController {
                     "the most relevant articles. It is possible to use logical operators with keywords, see the section " +
                     "on query syntax")
             String keywords) {
-        return gNewsClient.findHeadLines(category, language, country, max, keywords);
+        return ResponseEntity.ok().body(gNewsClient.findHeadLines(category, language, country, max, keywords));
     }
-
 }
 

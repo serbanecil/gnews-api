@@ -1,4 +1,4 @@
-package de.serbanecil.gnewsapi.error;
+package de.serbanecil.gnewsapi.exception;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;

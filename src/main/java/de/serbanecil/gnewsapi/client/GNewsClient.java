@@ -1,20 +1,17 @@
 package de.serbanecil.gnewsapi.client;
 
 import de.serbanecil.gnewsapi.client.model.Response;
-import de.serbanecil.gnewsapi.exception.GnewsApiException;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import io.github.resilience4j.retry.annotation.Retry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriBuilder;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
 
+/**
+ * Class used to make external calls to GNews.
+ */
 @Component
 public class GNewsClient {
 
@@ -38,13 +35,21 @@ public class GNewsClient {
     private final String BASE_URL_HEADLINES = "https://gnews.io/api/v4/top-headlines?";
     private final String BASE_URL_SEARCH = "https://gnews.io/api/v4/search?";
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    @Autowired
+    private RestTemplate restTemplate;
 
+    /**
+     * Method used to call the external service in order the retrieve the headlines.
+     *
+     * @param category The category of the headlines
+     * @param language The language of the headlines
+     * @param country The country of the headlines
+     * @param max The max number of headlines to fetch
+     * @param keywords The keywords to look for when searching for the headlines
+     * @return The requested headlines
+     */
     @Cacheable("headlines")
-    @CircuitBreaker(name = "headlines")
-    @Retry(name = "retryFindHeadlines", fallbackMethod = "fallbackAfterRetry")
     public Response findHeadLines(String category, String language, String country, int max, String keywords) {
-
         RequestBuilder requestBuilder = new RequestBuilder(BASE_URL_HEADLINES, defaultCategory, defaultLanguage,
                 defaultCountry, defaultMaxArticles)
                 .addCategory(category)
@@ -55,18 +60,38 @@ public class GNewsClient {
                 .addApiKey(apiKey);
 
         String url = requestBuilder.getBasePath();
-        try {
-            LOGGER.info(String.format("Calling url: %s", url));
-            return restTemplate.getForEntity(url, Response.class).getBody();
-        } catch (RestClientException e) {
-            LOGGER.error(e.getMessage());
-            throw new GnewsApiException(e.getMessage());
-        }
+        LOGGER.info(String.format("Calling url: %s", url));
+        return restTemplate.getForEntity(url, Response.class).getBody();
     }
 
-    public Response fallbackAfterRetry(Exception ex) {
-        throw new GnewsApiException("The External Service is unavailable and all retries have been exhausted!");
+    /**
+     * Method used to call the external service in order the search for news articles.
+     *
+     * @param category The category of the news articles.
+     * @param language The language of the news articles.
+     * @param country The coutnry of the news articles.
+     * @param max The max number of news articles to fetch
+     * @param keywords The keywords to look for when searching for news articles
+     * @param inKeyword Where to search for the given keywords.
+     * @return The requested news articles
+     */
+    @Cacheable("news")
+    public Response findNews(String category, String language, String country, int max, String keywords, String inKeyword) {
+        RequestBuilder requestBuilder = new RequestBuilder(BASE_URL_SEARCH,  defaultCategory, defaultLanguage,
+                defaultCountry, defaultMaxArticles)
+                .addKeywords(keywords, inKeyword)
+                .addCategory(category)
+                .addLanguage(language)
+                .addCountry(country)
+                .addMaxArticles(max)
+                .addApiKey(apiKey);
+
+        String url = requestBuilder.getBasePath();
+        LOGGER.info(String.format("Calling url: %s", url));
+        return restTemplate.getForEntity(url, Response.class).getBody();
     }
+
+
 
 
 }
