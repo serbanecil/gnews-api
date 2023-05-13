@@ -1,7 +1,6 @@
 package de.serbanecil.gnewsapi.controller;
 
 import de.serbanecil.gnewsapi.client.GNewsClient;
-import de.serbanecil.gnewsapi.client.controller.HeadlinesController;
 import de.serbanecil.gnewsapi.client.model.Response;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
