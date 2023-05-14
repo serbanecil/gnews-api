@@ -4,6 +4,7 @@ import de.serbanecil.gnewsapi.client.GNewsClient;
 import de.serbanecil.gnewsapi.client.model.Response;
 import de.serbanecil.gnewsapi.exception.ErrorResponseObject;
 import de.serbanecil.gnewsapi.exception.GnewsApiException;
+import de.serbanecil.gnewsapi.model.NewsSearchRequest;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -15,10 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * This class represents the controller for the News.
@@ -101,4 +99,44 @@ public class SearchController {
         }
         return ResponseEntity.ok().body(gNewsClient.findNews(category, language, country, max, keywords, in));
     }
+
+    @Operation(
+            description = "Returns the news articles with the given 'CATEGORY', from the given 'COUNTRY' " +
+                    "with the given 'LANGUAGE' using the given 'KEYWORDS' in location limited to 'MAX' articles (maximum 10)"
+    )
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "The news articles are returned to the caller",
+                            content = @Content(schema = @Schema(implementation = Response.class))),
+                    @ApiResponse(responseCode = "400", description = "Bad Request -- Your request is invalid.",
+                            content = @Content(schema = @Schema(implementation = ErrorResponseObject.class))),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized -- Your API key is wrong.",
+                            content = @Content(schema = @Schema(implementation = ErrorResponseObject.class))),
+                    @ApiResponse(responseCode = "403", description = "Forbidden -- You have reached your daily quota, " +
+                            "the next reset is at 00:00 UTC.",
+                            content = @Content(schema = @Schema(implementation = ErrorResponseObject.class))),
+                    @ApiResponse(responseCode = "429", description = "Too Many Requests -- You have made more requests " +
+                            "per second than you are allowed.",
+                            content = @Content(schema = @Schema(implementation = ErrorResponseObject.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error -- We had a problem with our " +
+                            "server. Try again later.",
+                            content = @Content(schema = @Schema(implementation = ErrorResponseObject.class))),
+                    @ApiResponse(responseCode = "503", description = "Service Unavailable -- We're temporarily offline " +
+                            "for maintenance. Please try again later.",
+                            content = @Content(schema = @Schema(implementation = ErrorResponseObject.class)))
+            }
+    )
+    @PostMapping("/getNews")
+    @CircuitBreaker(name = "Gnews")
+    public ResponseEntity<Response> searchNewsPost(
+        @RequestBody
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(required = true, description = "The request object")
+        NewsSearchRequest request) {
+            if (StringUtils.isBlank(request.getKeywords())) {
+                throw new GnewsApiException("The keywords are mandatory!");
+            }
+        return ResponseEntity.ok().body(gNewsClient.findNews(request.getCategory(), request.getLanguage(),
+                request.getCountry(), request.getMax(), request.getKeywords(), request.getIn()));
+        }
+
 }

@@ -2,6 +2,7 @@ package de.serbanecil.gnewsapi.controller;
 
 import de.serbanecil.gnewsapi.client.GNewsClient;
 import de.serbanecil.gnewsapi.client.model.Response;
+import de.serbanecil.gnewsapi.model.HeadlinesRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -37,6 +38,14 @@ public class HeadlinesControllerTest {
         when(client.findHeadLines(anyString(), anyString(), anyString(), anyInt(), anyString())).thenReturn(new Response());
 
         ResponseEntity<Response> result = subject.getHeadlines("", "", "", 10, "");
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+    }
+
+    @Test
+    public void testGetHeadlinesPost() {
+        when(client.findHeadLines(anyString(), anyString(), anyString(), anyInt(), anyString())).thenReturn(new Response());
+
+        ResponseEntity<Response> result = subject.getHeadlinesPost(new HeadlinesRequest("general", "de", "de", 2, ""));
         assertEquals(HttpStatus.OK, result.getStatusCode());
     }
 

@@ -3,6 +3,7 @@ package de.serbanecil.gnewsapi.controller;
 import de.serbanecil.gnewsapi.client.GNewsClient;
 import de.serbanecil.gnewsapi.client.model.Response;
 import de.serbanecil.gnewsapi.exception.GnewsApiException;
+import de.serbanecil.gnewsapi.model.NewsSearchRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -41,6 +42,14 @@ public class SearchControllerTest {
         when(client.findNews(anyString(), anyString(), anyString(), anyInt(), anyString(), anyString()))
                 .thenReturn(new Response());
         ResponseEntity<Response> response = subject.searchNews("", "", "", 10, "keywords", "");
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    public void testSearchNewsPost() {
+        when(client.findNews(anyString(), anyString(), anyString(), anyInt(), anyString(), anyString()))
+                .thenReturn(new Response());
+        ResponseEntity<Response> response = subject.searchNewsPost(new NewsSearchRequest("", "", "", 2, "test", ""));
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 }
