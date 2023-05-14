@@ -1,6 +1,5 @@
 package de.serbanecil.gnewsapi.integTest;
 
-import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import de.serbanecil.gnewsapi.client.model.Response;
 import org.junit.jupiter.api.*;
@@ -21,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ApplicationIntegTest {
 
-    private TestRestTemplate restTemplate = new TestRestTemplate();
+    private final TestRestTemplate restTemplate = new TestRestTemplate();
 
     @Test
     @Order(1)

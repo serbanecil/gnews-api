@@ -15,6 +15,9 @@
     <description>gnews-api</description>
     <properties>
         <java.version>17</java.version>
+        <wireMock.version>2.33.2</wireMock.version>
+        <resilience4j.Version>2.0.2</resilience4j.Version>
+        <openAPI.version>2.1.0</openAPI.version>
     </properties>
     <dependencies>
         <dependency>
@@ -46,14 +49,14 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.1.0</version>
+            <version>${openAPI.version}</version>
         </dependency>
 
         <!-- resilience4j -->
         <dependency>
             <groupId>io.github.resilience4j</groupId>
             <artifactId>resilience4j-spring-boot3</artifactId>
-            <version>2.0.2</version>
+            <version>${resilience4j.Version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -63,7 +66,7 @@
         <dependency>
             <groupId>com.github.tomakehurst</groupId>
             <artifactId>wiremock-jre8-standalone</artifactId>
-            <version>2.33.2</version>
+            <version>${wireMock.version}</version>
         </dependency>
     </dependencies>
 
