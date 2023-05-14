@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -30,8 +31,11 @@ public class GNewsClientTest {
     @Mock
     private RestTemplate restTemplate;
 
+
     @Test
     public void testFindHeadLinesSuccess(CapturedOutput capturedOutput) {
+        ReflectionTestUtils.setField(subject, "BASE_URL_HEADLINES", "https://gnews.io/api/v4/top-headlines?");
+
         List<Article> articlesList = new ArrayList<>();
         Response response = new Response();
         response.setTotalArticles(1);
@@ -51,6 +55,8 @@ public class GNewsClientTest {
 
     @Test
     public void testFindNewsSuccess(CapturedOutput capturedOutput) {
+        ReflectionTestUtils.setField(subject, "BASE_URL_SEARCH", "https://gnews.io/api/v4/search?");
+
         List<Article> articlesList = new ArrayList<>();
         Response response = new Response();
         response.setTotalArticles(1);

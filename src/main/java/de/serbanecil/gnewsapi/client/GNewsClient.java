@@ -32,8 +32,11 @@ public class GNewsClient {
     @Value("${client.apiKey}")
     private String apiKey;
 
-    private final String BASE_URL_HEADLINES = "https://gnews.io/api/v4/top-headlines?";
-    private final String BASE_URL_SEARCH = "https://gnews.io/api/v4/search?";
+    @Value("${client.baseUrl.headlines}")
+    private String BASE_URL_HEADLINES;
+
+    @Value("${client.baseUrl.search}")
+    private String BASE_URL_SEARCH;
 
     @Autowired
     private RestTemplate restTemplate;
